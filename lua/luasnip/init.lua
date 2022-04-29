@@ -202,12 +202,20 @@ local function snip_expand(snippet, opts)
 		end
 	end
 
-	session.current_nodes[vim.api.nvim_get_current_buf()] =
-		util.no_region_check_wrap(
-			snip.jump_into,
-			snip,
-			1
-		)
+	if not opts.skip_snippet then
+		-- we almost always want to just jump into the snippet.
+		session.current_nodes[vim.api.nvim_get_current_buf()] =
+			util.no_region_check_wrap(
+				snip.jump_into,
+				snip,
+				1
+			)
+	else
+		-- if skip_snippet is set, we don't jump into it, the active node is
+		-- just set to $0 of the snippet.
+		session.current_nodes[vim.api.nvim_get_current_buf()] =
+			snip.insert_nodes[0]
+	end
 
 	-- stores original snippet, it doesn't contain any data from expansion.
 	session.last_expand_snip = snippet
